@@ -1,0 +1,9 @@
+{
+	"name": "test",
+	"description": "Test app for davemail.",
+	"author": "Dave Winer <dave.winer@gmail.com>",
+	"version": "0.4.0",
+	"dependencies" : {
+		"davemail": "*"
+		}
+	}
