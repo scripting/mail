@@ -2,7 +2,8 @@
 	"name": "davemail",
 	"description": "Send email through AWS.",
 	"author": "Dave Winer <dave.winer@gmail.com>",
-	"version": "0.4.3",
+	"version": "0.4.5",
+	"main": "sendmail.js",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/scripting/mail.git"
