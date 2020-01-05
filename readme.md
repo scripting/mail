@@ -1,8 +1,10 @@
 # mail
 
-One place to send mail from all my Node apps. I was scattering this code everywhere. Now finally I have a <a href="https://www.npmjs.com/package/davemail">package</a>. 
+One place to send mail from all my Node apps. 
 
-* It builds on Amazon's SES. 
+* I was scattering this code everywhere. Now I have a <a href="https://www.npmjs.com/package/davemail">package</a>. 
+
+* It builds on <a href="https://aws.amazon.com/ses/">Amazon's SES</a>. 
 
 * One routine for all your mail-sending needs: mail.send.
 
