@@ -1,4 +1,4 @@
-const myProductName = "davemail", myVersion = "0.4.7"; 
+const myProductName = "davemail", myVersion = "0.4.10"; 
 
 const AWS = require ("aws-sdk");
 const utils = require ("daveutils");
@@ -11,6 +11,23 @@ var ses = new AWS.SES ({
 exports.send = sendMail;
 exports.sendRawEmail = sendRawEmail; //11/18/19 by DW
 
+const maxMailsPerSec = 10;  //1/5/20 by DW -- there's now a queue that limits mail to ten per second
+var mailQueue = new Array ();
+var flQueueThreadRunning = false; 
+var mailQueueInterval;  
+
+function checkMailQueue () {
+	if (mailQueue.length > 0) {
+		var item = mailQueue.shift (); //remove first element
+		sendActualMail (item.recipient, item.subject, item.message, item.sender, item.callback, item.attachments);
+		}
+	else {
+		if (flQueueThreadRunning) {
+			clearInterval (mailQueueInterval);
+			flQueueThreadRunning = false;
+			}
+		}
+	}
 function sendRawEmail (recipient, subject, message, sender, attachments, callback) { //11/18/19 by DW
 	var mailtext = "";
 	function add (s) {
@@ -50,7 +67,7 @@ function sendRawEmail (recipient, subject, message, sender, attachments, callbac
 			}
 		});
 	}
-function sendMail (recipient, subject, message, sender, callback, attachments) {
+function sendActualMail (recipient, subject, message, sender, callback, attachments) {
 	if (attachments === undefined) {
 		var theMail = {
 			Source: sender,
@@ -86,5 +103,14 @@ function sendMail (recipient, subject, message, sender, callback, attachments) {
 		}
 	else {
 		sendRawEmail (recipient, subject, message, sender, attachments, callback);
+		}
+	}
+function sendMail (recipient, subject, message, sender, callback, attachments) {
+	mailQueue.push ({
+		recipient, subject, message, sender, callback, attachments
+		});
+	if (!flQueueThreadRunning) {
+		flQueueThreadRunning = true;
+		mailQueueInterval = setInterval (checkMailQueue, 1000 / maxMailsPerSec); 
 		}
 	}
