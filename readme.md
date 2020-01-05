@@ -1,8 +1,6 @@
 # mail
 
-One place to send mail from all my Node apps. I was scattering this code everywhere. Now finally I have a package. 
-
-### It's pretty easy to use
+One place to send mail from all my Node apps. I was scattering this code everywhere. Now finally I have a <a href="https://www.npmjs.com/package/davemail">package</a>. 
 
 * It builds on Amazon's SES. 
 
@@ -14,11 +12,11 @@ One place to send mail from all my Node apps. I was scattering this code everywh
 
 ### Example
 
-<code>
+```javascript
 
 const mail = require ("davemail");
 
 mail.send (recipient, subject, message, sender);
 
-</code>
+```
 

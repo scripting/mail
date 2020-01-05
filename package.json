@@ -2,7 +2,7 @@
 	"name": "davemail",
 	"description": "Send email through AWS.",
 	"author": "Dave Winer <dave.winer@gmail.com>",
-	"version": "0.4.10",
+	"version": "0.4.11",
 	"main": "sendmail.js",
 	"files": [
 		"sendmail.js"

@@ -1,4 +1,4 @@
-const myProductName = "davemail", myVersion = "0.4.10"; 
+const myProductName = "davemail", myVersion = "0.4.11"; 
 
 const AWS = require ("aws-sdk");
 const utils = require ("daveutils");
