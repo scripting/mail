@@ -1,15 +1,23 @@
-const myProductName = "davemail", myVersion = "0.4.12"; 
+const myProductName = "davemail", myVersion = "0.5.4"; 
+
+exports.start = start; //1/23/23 by DW
+exports.send = sendMail;
+exports.sendRawEmail = sendRawEmail; //11/18/19 by DW
 
 const AWS = require ("aws-sdk");
 const utils = require ("daveutils");
+const nodemailer = require ("nodemailer");
 
 var ses = new AWS.SES ({
 	apiVersion: "2010-12-01",
 	region: "us-east-1"
 	});
 
-exports.send = sendMail;
-exports.sendRawEmail = sendRawEmail; //11/18/19 by DW
+var config = { //1/23/23 by DW
+	flUseSes: true
+	};
+
+var mailTransport; //1/23/23 by DW
 
 const maxMailsPerSec = 10;  //1/5/20 by DW -- there's now a queue that limits mail to ten per second
 var mailQueue = new Array ();
@@ -69,37 +77,56 @@ function sendRawEmail (recipient, subject, message, sender, attachments, callbac
 	}
 function sendActualMail (recipient, subject, message, sender, callback, attachments) {
 	if (attachments === undefined) {
-		var theMail = {
-			Source: sender,
-			ReplyToAddresses: [sender],
-			ReturnPath: sender,
-			Destination: {
-				ToAddresses: [recipient]
-				},
-			Message: {
-				Body: {
-					Html: {
-						Charset: "UTF-8", 
-						Data: message
+		if (config.flUseSes) {
+			var theMail = {
+				Source: sender,
+				ReplyToAddresses: [sender],
+				ReturnPath: sender,
+				Destination: {
+					ToAddresses: [recipient]
+					},
+				Message: {
+					Body: {
+						Html: {
+							Charset: "UTF-8", 
+							Data: message
+							},
+						Text: {
+							Charset: "UTF-8", 
+							Data: utils.stripMarkup (message)
+							}
 						},
-					Text: {
-						Charset: "UTF-8", 
-						Data: utils.stripMarkup (message)
+					Subject: {
+						Data: subject
 						}
 					},
-				Subject: {
-					Data: subject
+				};
+			ses.sendEmail (theMail, function (err, data) { 
+				if (err) {
+					console.log ("\nsendMail: err.message == " + err.message);
 					}
-				},
-			};
-		ses.sendEmail (theMail, function (err, data) { 
-			if (err) {
-				console.log ("\nsendMail: err.message == " + err.message);
-				}
-			if (callback !== undefined) { //8/18/19 by DW
-				callback (err, data);
-				}
-			});
+				if (callback !== undefined) { //8/18/19 by DW
+					callback (err, data);
+					}
+				});
+			}
+		else {
+			const mailOptions = {
+				to: recipient,
+				subject,
+				html: message,
+				text: utils.stripMarkup (message),
+				from: sender
+				};
+			mailTransport.sendMail (mailOptions, function (err, data) {
+				if (err) {
+					console.log ("\nsendMail: err.message == " + err.message);
+					}
+				if (callback !== undefined) { 
+					callback (err, data);
+					}
+				});
+			}
 		}
 	else {
 		sendRawEmail (recipient, subject, message, sender, attachments, callback);
@@ -112,5 +139,21 @@ function sendMail (recipient, subject, message, sender, callback, attachments) {
 	if (!flQueueThreadRunning) {
 		flQueueThreadRunning = true;
 		mailQueueInterval = setInterval (checkMailQueue, 1000 / maxMailsPerSec); 
+		}
+	}
+function start (options) { //1/23/23 by DW
+	var flUseSes = (options.flUseSes === undefined) ? true : utils.getBoolean (options.flUseSes);
+	config.flUseSes = flUseSes; //so davemail routines know whether to use SMTP or SES
+	if (!flUseSes) { //using SMTP
+		const nodemailerOptions = {
+			host: options.smtpHost,
+			port: options.port,
+			secure: (options.port == 465),
+			auth: {
+				user: options.username,
+				pass: options.password
+				}
+			};
+		mailTransport = nodemailer.createTransport (nodemailerOptions);
 		}
 	}
