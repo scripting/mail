@@ -1,4 +1,4 @@
-const myProductName = "davemail", myVersion = "0.5.4"; 
+const myProductName = "davemail", myVersion = "0.5.7"; 
 
 exports.start = start; //1/23/23 by DW
 exports.send = sendMail;
@@ -101,9 +101,13 @@ function sendActualMail (recipient, subject, message, sender, callback, attachme
 						}
 					},
 				};
+			console.log ("sendActualMail via SES: recipient == " + recipient); //7/11/25 by DW
 			ses.sendEmail (theMail, function (err, data) { 
 				if (err) {
-					console.log ("\nsendMail: err.message == " + err.message);
+					console.log ("\nsendActualMail via SES: err.message == " + err.message);
+					}
+				else {
+					console.log ("\nsendActualMail via SES: data == " + utils.jsonStringify (data)); //7/11/25 by DW
 					}
 				if (callback !== undefined) { //8/18/19 by DW
 					callback (err, data);

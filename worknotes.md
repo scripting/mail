@@ -1,3 +1,7 @@
+#### 7/11/25; 9:47:28 AM by DW
+
+Add debugging code to show the result of sending an SES message in the console. 
+
 #### 1/23/23; 3:05:07 PM by DW -- v0.5.0
 
 davemail works with SMTP.
