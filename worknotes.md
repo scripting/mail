@@ -1,3 +1,9 @@
+#### 10/11/26; 12:13:14 PM by DW
+
+In start, don't overwrite the settings with SES if mailTransport is already defined
+
+* https://github.com/scripting/feedlandInstall/issues/79
+
 #### 7/11/25; 9:47:28 AM by DW
 
 Add debugging code to show the result of sending an SES message in the console. 

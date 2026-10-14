@@ -1,4 +1,4 @@
-const myProductName = "davemail", myVersion = "0.5.7"; 
+const myProductName = "davemail", myVersion = "0.5.8"; 
 
 exports.start = start; //1/23/23 by DW
 exports.send = sendMail;
@@ -147,6 +147,9 @@ function sendMail (recipient, subject, message, sender, callback, attachments) {
 	}
 function start (options) { //1/23/23 by DW
 	var flUseSes = (options.flUseSes === undefined) ? true : utils.getBoolean (options.flUseSes);
+	if (flUseSes && (mailTransport !== undefined)) {  //10/11/26 by DW
+		return;
+		}
 	config.flUseSes = flUseSes; //so davemail routines know whether to use SMTP or SES
 	if (!flUseSes) { //using SMTP
 		const nodemailerOptions = {
